@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import pandas as pd
+from datetime import datetime
 
 st.title("Dự đoán giá cổ phiếu Việt Nam")
 
@@ -11,6 +12,9 @@ model_type = st.selectbox("Chọn mô hình:", ["lstm", "random_forest"])
 
 if st.button("Dự đoán"):
     try:
+        start_date_str = start_date.strftime('%Y-%m-%d')
+        end_date_str = end_date.strftime('%Y-%m-%d')
+        
         response = requests.get("http://127.0.0.1:8000/predict", params={
             "symbol": symbol,
             "start_date": start_date,

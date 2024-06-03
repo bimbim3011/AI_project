@@ -5,6 +5,7 @@ def feature_engineering(df):
     df['close_lag3'] = df['close'].shift(3)
     df['close_rolling_mean'] = df['close'].rolling(window=5).mean()
     df['close_rolling_std'] = df['close'].rolling(window=5).std()
+    df['moving_avg'] = df['Close'].rolling(window=5).mean()
     
     df.dropna(inplace=True)
     return df

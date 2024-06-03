@@ -7,8 +7,8 @@ def preprocess_data(df):
     # Sort data by date
     df.sort_values('date', inplace=True)
     
-    # Handle missing values (if any)
-    df.fillna(method='ffill', inplace=True)
+    df.dropna(inplace=True)  # Loại bỏ các hàng có giá trị thiếu
+    df.ffill(inplace=True)  # Thực hiện forward fill để điền giá trị thiếu
     
     # Select relevant columns and extract additional features
     df['year'] = df['date'].dt.year
@@ -22,4 +22,6 @@ def preprocess_data(df):
     # Select final columns
     df = df[['date', 'close', 'year', 'month', 'day', 'day_of_week']]
     
+    df = df.dropna()  # Ví dụ: loại bỏ các hàng có giá trị thiếu
+
     return df

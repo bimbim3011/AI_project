@@ -17,7 +17,11 @@ class LSTMModel(nn.Module):
         return predictions
 
 def create_lstm_model(input_shape):
-    model = LSTMModel(input_size=input_shape[1])
+    model = nn.Sequential(
+        nn.LSTM(input_shape[1], 50, batch_first=True),
+        nn.ReLU(),
+        nn.Linear(50, 1)
+    )
     return model
 
 def prepare_lstm_data(X, y):
@@ -27,14 +31,23 @@ def prepare_lstm_data(X, y):
     y_lstm = torch.from_numpy(y_lstm)
     return X_lstm, y_lstm
 
-def train_random_forest(X, y):
+def train_random_forest(X_train, y_train):
     model = RandomForestRegressor(n_estimators=100)
-    model.fit(X, y)
+    model.fit(X_train, y_train)
     return model
 
 def split_data(df):
-    X = df.drop(['date', 'close'], axis=1)
-    y = df['close']
-    X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.3, random_state=42)
-    X_dev, X_test, y_dev, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42)
+    df.sort_values(by='date', inplace=True)
+    X = df.drop(columns=['date', 'symbol', 'Close'])  # Giả định 'Close' là cột mục tiêu
+    y = df['Close']
+
+    train_size = int(len(df) * 0.7)
+    dev_size = int(len(df) * 0.1)
+    
+    X_train = X[:train_size]
+    y_train = y[:train_size]
+    X_dev = X[train_size:train_size + dev_size]
+    y_dev = y[train_size:train_size + dev_size]
+    X_test = X[train_size + dev_size:]
+    y_test = y[train_size + dev_size:]
     return X_train, y_train, X_dev, y_dev, X_test, y_test
