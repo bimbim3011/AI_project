@@ -1,0 +1,6 @@
+streamlit
+pandas
+matplotlib
+torch
+scikit-learn
+vnstock
