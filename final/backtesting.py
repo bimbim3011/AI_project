@@ -8,6 +8,7 @@ def backtest_strategy(ticker, start_date, end_date, strategy_func):
     results = calculate_returns(df, signals)
     return results
 
+# Cumulative Market (Lũy kế Thị trường), Cumulative Strategy (Lũy kế Chiến lược)
 def calculate_returns(df, signals):
     df['Strategy'] = df['return'] * signals.shift(1)
     df['Cumulative Market'] = (1 + df['return']).cumprod()

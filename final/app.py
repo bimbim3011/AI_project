@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 from utils import fetch_historical_data, preprocess_data, fetch_current_data
 from backtesting import backtest_strategy, example_strategy
 from stock_prediction import predict_stock_price
@@ -37,15 +38,21 @@ def main():
                 historical_data = fetch_historical_data(ticker, start_date_str, end_date_str)
                 historical_data = preprocess_data(historical_data)
                 st.write(historical_data.head())
+
+                # Plot interactive chart with Plotly
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(x=historical_data.index, y=historical_data['close'], mode='lines', name='Close Price'))
+                fig.update_layout(title=f"Historical Data for {ticker}", xaxis_title="Date", yaxis_title="Price")
+                st.plotly_chart(fig)
             except KeyError as e:
                 st.error(f"Error fetching historical data: {e}")
 
-            st.write("Fetching current data...")
-            try:
-                current_data = fetch_current_data(ticker)
-                st.write(current_data.head())
-            except KeyError as e:
-                st.error(f"Error fetching current data: {e}")
+            # st.write("Fetching current data...")
+            # try:
+            #     current_data = fetch_current_data(ticker)
+            #     st.write(current_data.head())
+            # except KeyError as e:
+            #     st.error(f"Error fetching current data: {e}")
         else:
             st.error(f"Invalid stock ticker: {ticker}")
 
@@ -58,9 +65,16 @@ def main():
                 backtest_results = backtest_strategy(ticker, start_date_str, end_date_str, example_strategy)
                 st.write(backtest_results[['Cumulative Market', 'Cumulative Strategy']].tail())
                 
-                fig, ax = plt.subplots()
-                backtest_results[['Cumulative Market', 'Cumulative Strategy']].plot(ax=ax)
-                st.pyplot(fig)
+                # fig, ax = plt.subplots()
+                # backtest_results[['Cumulative Market', 'Cumulative Strategy']].plot(ax=ax)
+                # st.pyplot(fig)
+                
+                # Plot interactive backtesting results
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(x=backtest_results.index, y=backtest_results['Cumulative Market'], mode='lines', name='Cumulative Market'))
+                fig.add_trace(go.Scatter(x=backtest_results.index, y=backtest_results['Cumulative Strategy'], mode='lines', name='Cumulative Strategy'))
+                fig.update_layout(title="Backtesting Results", xaxis_title="Date", yaxis_title="Cumulative Returns")
+                st.plotly_chart(fig)
             except Exception as e:
                 st.error(f"Error during backtesting: {e}")
         else:
@@ -84,11 +98,18 @@ def main():
                 pred_index = historical_data.index[-len(predictions):]
                 historical_data.loc[pred_index, 'Predicted Close'] = predictions
 
-                fig, ax = plt.subplots()
-                historical_data['close'].plot(ax=ax, label='Actual Close')
-                historical_data['Predicted Close'].plot(ax=ax, label='Predicted Close')
-                plt.legend()
-                st.pyplot(fig)
+                # fig, ax = plt.subplots()
+                # historical_data['close'].plot(ax=ax, label='Actual Close')
+                # historical_data['Predicted Close'].plot(ax=ax, label='Predicted Close')
+                # plt.legend()
+                # st.pyplot(fig)
+
+                # Plot interactive chart with predictions
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(x=historical_data.index, y=historical_data['close'], mode='lines', name='Actual Close'))
+                fig.add_trace(go.Scatter(x=pred_index, y=predictions, mode='lines', name='Predicted Close'))
+                fig.update_layout(title=f"Predicted vs Actual Close Price for {ticker}", xaxis_title="Date", yaxis_title="Price")
+                st.plotly_chart(fig)
             except Exception as e:
                 st.error(f"Error predicting stock price: {e}")
         else:

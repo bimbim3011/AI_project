@@ -3,13 +3,18 @@ import torch.nn as nn
 import torch.optim as optim
 from sklearn.ensemble import RandomForestRegressor
 
+#Lớp định nghĩa mô hình LSTM sử dụng PyTorch.
+
 class LSTMModel(nn.Module):
+    #Hàm khởi tạo của lớp, định nghĩa kích thước đầu vào, kích thước lớp ẩn và kích thước đầu ra. 
+    # Nó tạo một lớp LSTM và một lớp Linear.
     def __init__(self, input_size, hidden_layer_size, output_size):
         super(LSTMModel, self).__init__()
         self.hidden_layer_size = hidden_layer_size
         self.lstm = nn.LSTM(input_size, hidden_layer_size, batch_first=True)
         self.linear = nn.Linear(hidden_layer_size, output_size)
-    
+    # Forward Là hàm nhận vào là dữ liệu input ban đầu. 
+    # Dữ liệu sẽ đi lần lượt qua từng layer của model và trả về output của model
     def forward(self, x):
         lstm_out, _ = self.lstm(x)
         predictions = self.linear(lstm_out[:, -1, :])
